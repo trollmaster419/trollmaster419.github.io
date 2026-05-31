@@ -8,14 +8,10 @@
 import { ESPLoader, Transport } from 'https://unpkg.com/esptool-js@0.5.4/bundle.js';
 
 const firmware = [
-  { file: 'bootloader.bin', offset: 0x1000, label: 'Bootloader', id: 'cb-bl' },
-  { file: 'partition-table.bin', offset: 0x8000, label: 'Partition table', id: 'cb-pt' },
-  { file: 'furi_esp32.bin', offset: 0x10000, label: 'Firmware', id: 'cb-fw' },
+  { file: 'bootloader.bin', offset: 0x1000, label: 'Bootloader' },
+  { file: 'partition-table.bin', offset: 0x8000, label: 'Partition table' },
+  { file: 'furi_esp32.bin', offset: 0x10000, label: 'Firmware' },
 ];
-
-function getSelectedParts() {
-  return firmware.filter(f => document.getElementById(f.id).checked);
-}
 
 let transport = null;
 
@@ -67,7 +63,7 @@ async function flash() {
   try {
     const esploader = new ESPLoader({
       transport,
-      baudrate: 921600,
+      baudrate: 460800,
       romBaudrate: 115200,
       terminal: {
         clean() {},
@@ -83,10 +79,7 @@ async function flash() {
     const fileArray = [];
     let totalSize = 0;
 
-    const selected = getSelectedParts();
-    if (!selected.length) { log('No parts selected.'); setBtn('Flash firmware', false); return; }
-
-    for (const part of selected) {
+    for (const part of firmware) {
       log('Loading ' + part.label + '...');
       const resp = await fetch(part.file);
       if (!resp.ok) throw new Error('Failed to load ' + part.file);
@@ -155,33 +148,6 @@ h1 {
   color: #666;
   font-size: 0.85rem;
   margin-bottom: 32px;
-}
-.parts {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 20px;
-  text-align: left;
-}
-.part-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #161616;
-  padding: 10px 14px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: #ccc;
-  transition: 0.15s;
-}
-.part-label:hover { background: #1e1e1e; }
-.part-label input { accent-color: #ff8c00; }
-.part-label.select-all {
-  background: #111;
-  border: 1px solid #333;
-  font-weight: 600;
-  color: #eee;
 }
 #flash-btn {
   background: #ff8c00;
@@ -267,18 +233,7 @@ h1 {
 <div class="card">
   <h1>M5Stick Flasher</h1>
   <p class="sub">Flipper Zero ESP32 Port</p>
-  <div class="parts">
-    <label class="part-label select-all"><input type="checkbox" id="cb-all" checked> <span>All</span></label>
-    <label class="part-label"><input type="checkbox" id="cb-bl" checked> <span>Bootloader (0x1000)</span></label>
-    <label class="part-label"><input type="checkbox" id="cb-pt" checked> <span>Partition table (0x8000)</span></label>
-    <label class="part-label"><input type="checkbox" id="cb-fw" checked> <span>Firmware (0x10000)</span></label>
-  </div>
   <button id="flash-btn">Select device</button>
-  <script>
-    document.getElementById('cb-all').addEventListener('change', e => {
-      document.querySelectorAll('.parts input').forEach(cb => cb.checked = e.target.checked);
-    });
-  </script>
   <div class="bar-wrap"><div id="progress-bar"></div></div>
   <div id="log"></div>
 </div>
