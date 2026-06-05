@@ -9,9 +9,9 @@
         const BOARD = {
             name: 'M5StickC Plus2',
             chip: 'ESP32-PICO-V3-02',
-            flashSize: '16MB',
+            flashSize: '8MB',
             parts: [
-                { path: 'bootloader.bin', offset: 0x0 },
+                { path: 'bootloader.bin', offset: 0x1000 },
                 { path: 'partition-table.bin', offset: 0x8000 },
                 { path: 'furi_esp32.bin', offset: 0x10000 },
             ],
