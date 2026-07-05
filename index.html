@@ -17,6 +17,15 @@
             ],
         };
 
+        // Beta (multi-boot) layout: same bootloader + partition, then ota_data
+        // at 0xf000 and the combined Flipper+other_os firmware at ota_0 offset.
+        const BETA_PARTS = [
+            { path: 'bootloader.bin', offset: 0x1000 },
+            { path: 'partition-table.bin', offset: 0x8000 },
+            { path: 'ota_data_initial.bin', offset: 0xf000 },
+            { path: 'furi_esp32.bin', offset: 0x20000 },
+        ];
+
         let port = null;
         let transport = null;
         let betaMode = false;
@@ -144,8 +153,9 @@
                 // Beta testers pull binaries from the beta/ folder; everyone else
                 // gets the stable binaries at the repo root.
                 const base = betaMode ? 'beta/' : '';
+                const parts = betaMode ? BETA_PARTS : BOARD.parts;
 
-                for (const part of BOARD.parts) {
+                for (const part of parts) {
                     const partPath = base + part.path;
                     progressText.textContent = `Loading ${partPath.split('/').pop()}...`;
                     const resp = await fetch(partPath);
@@ -168,7 +178,7 @@
                     reportProgress: (idx, written, total) => {
                         const pct = Math.round((written / total) * 100);
                         progress.style.width = pct + '%';
-                        progressText.textContent = `Flashing part ${idx + 1}/${BOARD.parts.length}... ${pct}%`;
+                        progressText.textContent = `Flashing part ${idx + 1}/${parts.length}... ${pct}%`;
                     },
                 });
 
