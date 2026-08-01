@@ -17,13 +17,13 @@
             ],
         };
 
-        // Beta (multi-boot) layout: same bootloader + partition, then ota_data
-        // at 0xf000 and the combined Flipper+other_os firmware at ota_0 offset.
+        // Beta layout: same single-app factory layout as stable — bootloader +
+        // partition table + app at 0x10000 (no ota_data). Only the firmware
+        // content differs (newer build in the beta/ folder).
         const BETA_PARTS = [
             { path: 'bootloader.bin', offset: 0x1000 },
             { path: 'partition-table.bin', offset: 0x8000 },
-            { path: 'ota_data_initial.bin', offset: 0xf000 },
-            { path: 'furi_esp32.bin', offset: 0x20000 },
+            { path: 'furi_esp32.bin', offset: 0x10000 },
         ];
 
         let port = null;
@@ -172,7 +172,7 @@
                     fileArray,
                     flashSize: BOARD.flashSize,
                     flashMode: 'dio',
-                    flashFreq: '80m',
+                    flashFreq: '40m',
                     eraseAll: false,
                     compress: true,
                     reportProgress: (idx, written, total) => {
@@ -573,7 +573,7 @@
             <span id="connect-text">Select device</span>
         </button>
 
-        <div class="chip">ESP32-PICO-V3-02 &bull; 16MB</div>
+        <div class="chip">ESP32-PICO-V3-02 &bull; 8MB</div>
 
         <label class="beta-toggle">
             <input type="checkbox" id="beta-checkbox" onchange="onBetaToggle()">
